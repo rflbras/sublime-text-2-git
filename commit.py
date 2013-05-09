@@ -50,7 +50,7 @@ class GitQuickCommitCommand(GitTextCommand):
 # 6. `commit -F [tempfile]`
 class GitCommitCommand(GitWindowCommand):
     active_message = False
-    extra_options = ""
+    extra_options = "-a"
 
     def run(self):
         self.lines = []
@@ -61,20 +61,10 @@ class GitCommitCommand(GitWindowCommand):
             )
 
     def porcelain_status_done(self, result):
-        # todo: split out these status-parsing things... asdf
-        has_staged_files = False
-        result_lines = result.rstrip().split('\n')
-        for line in result_lines:
-            if line and not line[0].isspace():
-                has_staged_files = True
-                break
-        if not has_staged_files:
-            self.panel("Nothing to commit")
-            return
         # Okay, get the template!
         s = sublime.load_settings("Git.sublime-settings")
         if s.get("verbose_commits"):
-            self.run_command(['git', 'diff', '--staged', '--no-color'], self.diff_done)
+            self.run_command(['git', 'diff', '--no-color'], self.diff_done)
         else:
             self.run_command(['git', 'status'], self.diff_done)
 
